@@ -1,36 +1,87 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-const vscode = require('vscode');
+const vscode = require("vscode");
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-
-/**
- * @param {vscode.ExtensionContext} context
- */
 function activate(context) {
+  // Create a webview panel
+  const panel = vscode.window.createWebviewPanel(
+    "myExtension",
+    "My Extension",
+    vscode.ViewColumn.One,
+    {
+      enableScripts: true,
+    }
+  );
+  let disposable = vscode.commands.registerCommand(
+    "help.helloWorld",
+    function () {
+      // The code you place here will be executed every time your command is executed
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "help" is now active!');
+      // Display a message box to the user
+      vscode.window.showInformationMessage("Hello World from Anchor!");
+    }
+  );
+  // Load the HTML content into the webview
+  panel.webview.html = getWebviewContent();
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('help.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Anchor!');
-	});
-
-	context.subscriptions.push(disposable);
+  // Handle messages from the webview
+  panel.webview.onDidReceiveMessage((message) => {
+    if (message.command === "buttonClicked") {
+      vscode.window.showInformationMessage("Button clicked!");
+    }
+  });
 }
 
-// This method is called when your extension is deactivated
-function deactivate() {}
+function getWebviewContent() {
+  return `<!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #007ACC;
+        color: #FFF;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      #message {
+        margin-top: 20px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Anchor K8S</h1>
+	<p>This a basics of extension.</p>
+    <button id="btnClick">Click me</button>
+    <p id="message"></p>
+	<h4>Helm Chart List</h4>
+	<input style="width:350px; height:100px;" placeholder="Give a list of helm charts you want to use."></input>
+    <script>
+      const vscode = acquireVsCodeApi();
+
+      // Handle button click event
+      document.getElementById("btnClick").addEventListener("click", function() {
+        var messageElement = document.getElementById("message");
+        messageElement.textContent = "Button clicked!";
+        
+        // Send a message to the extension code
+        vscode.postMessage({ command: 'buttonClicked' });
+      });
+    </script>
+  </body>
+  </html>`;
+}
 
 module.exports = {
-	activate,
-	deactivate
-}
+  activate,
+};
