@@ -11,6 +11,7 @@
   ],
   "activationEvents": [],
   "main": "./main.js",
+  "panel": "./panel.js",
   "contributes": {
     "commands": [{
       "command": "help.helloWorld",
