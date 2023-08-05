@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { addInlineComment } from '../utils/inlineComments';
+import { generateInlineComments } from '../utils/inlineComments';
 
 export function generateInlineCommands() {
     const editor = vscode.window.activeTextEditor;
@@ -12,7 +12,7 @@ export function generateInlineCommands() {
     const selection = editor.selection;
     const selectedLine = selection.active.line + 1;
 
-    addInlineComment(selectedLine, 'Review this code.');
+    generateInlineComments();
 
     vscode.window.showInformationMessage('Inline comment added.');
 }
