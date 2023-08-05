@@ -1,0 +1,69 @@
+{
+  "name": "backdoor",
+  "displayName": "Backdoor",
+  "description": "AI powered code reviews.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.54.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:backdoor.analyzeCode",
+    "onCommand:backdoor.generateInlineCommands",
+    "onCommand:backdoor.reviewSuggestion",
+    "onCommand:backdoor.backdoorDashboardInit"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "backdoor.analyzeCode",
+        "title": "Backdoor: Analyze Code"
+      },
+      {
+        "command": "backdoor.generateInlineCommands",
+        "title": "Backdoor: Generate Inline Commands"
+      },
+      {
+        "command": "backdoor.reviewSuggestion",
+        "title": "Backdoor: Review Suggestion"
+      },
+      {
+        "command": "backdoor.backdoorDashboardInit",
+        "title": "Backdoor Reviewer: Dashboard"
+    }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc",
+    "watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vscode:prepublish": "npm run package",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.4.7",
+    "@types/vscode": "^1.54.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "@vscode/test-electron": "^2.3.2",
+    "eslint": "^8.41.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.4.3",
+    "typescript": "^5.1.3",
+    "webpack": "^5.85.0",
+    "webpack-cli": "^5.1.1"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security"
+  }
+}
