@@ -87,7 +87,6 @@ function analyzeCode() {
                 messageRules.naming = `Non-camelCase variables found: ${nonCamelCaseInfo}`;
                 vscode.window.showWarningMessage(`Non-camelCase variables found: ${nonCamelCaseInfo}`);
             }
-            // Convert " " strings to ' '
             let modifiedContent = data;
             const stringLiteralRegex = /"(.*?)"/g;
             let match;

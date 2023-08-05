@@ -37,10 +37,12 @@ const vscode = __importStar(require("vscode"));
 const analyzeCode_1 = require("./commands/analyzeCode");
 const generateInlineCommands_1 = require("./commands/generateInlineCommands");
 const reviewSuggestion_1 = require("./commands/reviewSuggestion");
+const generateKubernetesFiles_1 = require("./commands/generateKubernetesFiles");
 function activate(context) {
     console.log('Backdoor extension is now active.');
+    vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.reviewSuggestion', reviewSuggestion_1.reviewSuggestion), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard));
+    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.reviewSuggestion', reviewSuggestion_1.reviewSuggestion), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles));
 }
 exports.activate = activate;
 function showBackdoorDashboard() {
@@ -71,6 +73,10 @@ function getWebviewContent(webview) {
         <body>
             <h1>Backdoor Code Reviewer</h1>
             <p style="color:white;"> Backdoor is a free code reviewer assistant. It helps developers with AI support, increases code quality with highlighter and linter features.<p>
+            <br>
+            <hr>
+            <h2>Generate Kubernetes Deployment Files</h2>
+            <p style="color:white;"> Type CTRL + l for generate kubernetes deployment files. When you type this command input box will open. <br>Type your apps like backend, frontned with comma seperation. Enjoy.<p>
             <button id="analyzeButton" style="${buttonStyle}">Enable Code Analysis</button>
             <button id="analyzeButton" style="${buttonStyle}">Enable AI Support</button>
             <button id="analyzeButton" style="${buttonStyle}">Enable Highlighter</button>
