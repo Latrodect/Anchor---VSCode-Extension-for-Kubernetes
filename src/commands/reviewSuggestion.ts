@@ -12,10 +12,8 @@ export function reviewSuggestion() {
     const selection = editor.selection;
     const selectedText = editor.document.getText(selection);
 
-    // Generate review suggestions
     const suggestions = generateReviewerSuggestions(selectedText);
 
-    // Display suggestions
     if (suggestions.length > 0) {
         const suggestionList = suggestions.map(suggestion => `- ${suggestion}`).join('\n');
         vscode.window.showInformationMessage(`Review Suggestions:\n${suggestionList}`);

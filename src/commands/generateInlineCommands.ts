@@ -12,7 +12,6 @@ export function generateInlineCommands() {
     const selection = editor.selection;
     const selectedLine = selection.active.line + 1;
 
-    // Generate inline comment
     addInlineComment(selectedLine, 'Review this code.');
 
     vscode.window.showInformationMessage('Inline comment added.');
