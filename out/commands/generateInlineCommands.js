@@ -34,8 +34,7 @@ function generateInlineCommands() {
     }
     const selection = editor.selection;
     const selectedLine = selection.active.line + 1;
-    // Generate inline comment
-    (0, inlineComments_1.addInlineComment)(selectedLine, 'Review this code.');
+    (0, inlineComments_1.generateInlineComments)();
     vscode.window.showInformationMessage('Inline comment added.');
 }
 exports.generateInlineCommands = generateInlineCommands;

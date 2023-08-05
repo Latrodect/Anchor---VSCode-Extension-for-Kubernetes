@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-
 export function analyzeCode() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -73,8 +72,6 @@ export function analyzeCode() {
                 `Non-camelCase variables found: ${nonCamelCaseInfo}`
             );
         }
-
-        // Convert " " strings to ' '
 
         let modifiedContent = data;
 
