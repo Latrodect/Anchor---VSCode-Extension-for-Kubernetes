@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import axios from 'axios'; // Install axios using npm or yarn
+import axios from 'axios';
 
 export async function generateInlineComments() {
     const editor = vscode.window.activeTextEditor;
@@ -57,7 +57,6 @@ async function generateComment(code: string): Promise<string> {
 }
 
 function insertComment(editor: vscode.TextEditor, comment: string) {
-    // Insert the generated comment at the end of the selected code
     const selection = editor.selection;
     const position = selection.end;
     editor.edit(editBuilder => {

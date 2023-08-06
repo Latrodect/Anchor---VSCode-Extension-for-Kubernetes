@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateInlineComments = void 0;
 const vscode = __importStar(require("vscode"));
-const axios_1 = __importDefault(require("axios")); // Install axios using npm or yarn
+const axios_1 = __importDefault(require("axios"));
 function generateInlineComments() {
     return __awaiter(this, void 0, void 0, function* () {
         const editor = vscode.window.activeTextEditor;
@@ -88,7 +88,6 @@ function generateComment(code) {
     });
 }
 function insertComment(editor, comment) {
-    // Insert the generated comment at the end of the selected code
     const selection = editor.selection;
     const position = selection.end;
     editor.edit(editBuilder => {
