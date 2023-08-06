@@ -44,13 +44,13 @@ function generateDockerFiles() {
         }
         const projectRoot = yield vscode.window.showInputBox({
             prompt: 'Root of your project:',
-            placeHolder: '/code/src',
+            placeHolder: 'Example Usage: D:/MyProject/src',
         });
-        const contApplicaitonsPath = yield vscode.window.showInputBox({
-            prompt: 'Your Apps Path:',
-            placeHolder: 'frontned, backend, sync',
+        const contApplicaitons = yield vscode.window.showInputBox({
+            prompt: 'Your Apps:',
+            placeHolder: 'Example Usage(application folder names): frontned, backend, sync',
         });
-        if (!contApplicaitonsPath) {
+        if (!contApplicaitons) {
             vscode.window.showWarningMessage('Please specify at least one application path.');
             return;
         }
@@ -60,31 +60,64 @@ function generateDockerFiles() {
         }
         const dockerFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'docker');
         fs.mkdirSync(dockerFolder.fsPath, { recursive: true });
-        const dockerApplications = contApplicaitonsPath.split(',').map(name => name.trim());
+        const scriptsFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'scripts');
+        fs.mkdirSync(scriptsFolder.fsPath, { recursive: true });
+        const dockerApplicationsPath = contApplicaitons.split(',').map(name => "../docker/" + name.trim() + "/Dockerfile");
+        const scriptContent = `
+                                #!/bin/bash
+
+                            # Define the applications and their Dockerfile paths
+                            APPLICATIONS=(${contApplicaitons})
+                            DOCKERFILES=("${dockerApplicationsPath}")
+
+                            # Loop through each application and build the Docker image
+                            for ((i=0; i<\${#APPLICATIONS[@]}; i++)); do
+                                APP_NAME="\${APPLICATIONS[$i]}"
+                                DOCKERFILE="\${DOCKERFILES[$i]}"
+                                echo "Building Docker image for $APP_NAME..."
+                                
+                                # Check if the Dockerfile exists
+                                if [ ! -f "$DOCKERFILE" ]; then
+                                    echo "Dockerfile not found for $APP_NAME."
+                                    continue
+                                fi
+                                
+                                # Build the Docker image
+                                docker build -t "$APP_NAME:latest" -f "$DOCKERFILE" .
+                                
+                                echo "Docker image for $APP_NAME built."
+                                echo
+                            done
+
+                            echo "All Docker images built."
+                            `;
+        const scriptFilePath = path.join(scriptsFolder.fsPath, 'docker_build_image.bash');
+        yield writeFileWithDirectoryCheck(scriptFilePath, scriptContent);
+        const dockerApplications = contApplicaitons.split(',').map(name => name.trim());
         for (const appName of dockerApplications) {
             const appFolder = vscode.Uri.joinPath(dockerFolder, appName);
             fs.mkdirSync(appFolder.fsPath, { recursive: true });
             const folderPath = findApplicationFolder(projectRoot, appName);
             if (folderPath) {
                 const dockerFileContent = `
-# Use a base image
-FROM node:14
+                                        # Use a base image
+                                        FROM node:14
 
-# Set the working directory inside the container
-WORKDIR /app
+                                        # Set the working directory inside the container
+                                        WORKDIR /app
 
-# Install dependencies
-RUN npm install
+                                        # Install dependencies
+                                        RUN npm install
 
-# Copy the rest of the application code to the container
-COPY ${folderPath} ./src/${appName}
+                                        # Copy the rest of the application code to the container
+                                        COPY ${folderPath} ./src/${appName}
 
-# Expose a port (if needed)
-EXPOSE 3000
+                                        # Expose a port (if needed)
+                                        EXPOSE 3000
 
-# Specify the command to run when the container starts
-CMD ["npm", "run", "start"]
-`;
+                                        # Specify the command to run when the container starts
+                                        CMD ["npm run start"]
+                                    `;
                 const dockerFilePath = path.join(appFolder.fsPath, 'Dockerfile');
                 yield writeFileWithDirectoryCheck(dockerFilePath, dockerFileContent);
             }

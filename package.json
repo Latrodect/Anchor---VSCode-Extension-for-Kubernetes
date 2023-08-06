@@ -2,7 +2,7 @@
   "name": "backdoor",
   "displayName": "Backdoor",
   "description": "K8S and Docker Structure generator. Online code reviewer.",
-  "publisher": "Latrodect",
+  "publisher": "Pilliage",
   "icon": "images/backdoor.png", 
   "version": "0.0.1",
   "repository": {
@@ -71,7 +71,8 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "vsce:package": "vsce package"
+    "vsce:package": "vsce package",
+    "vsce:publish": "vsce publish"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
