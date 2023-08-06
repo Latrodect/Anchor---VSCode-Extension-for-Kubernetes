@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { analyzeCode } from './commands/analyzeCode';
 import { generateInlineCommands } from './commands/generateInlineCommands';
-import { reviewSuggestion } from './commands/reviewSuggestion';
+import { generateDockerFiles } from './commands/generateDockerFiles';
 import { generateKubernetesFiles } from './commands/generateKubernetesFiles';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode),
         vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands),
-        vscode.commands.registerCommand('backdoor.reviewSuggestion', reviewSuggestion),
+        vscode.commands.registerCommand('backdoor.reviewSuggestion', generateDockerFiles),
         vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard),
         vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles)
     );

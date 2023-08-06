@@ -36,13 +36,12 @@ exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(require("vscode"));
 const analyzeCode_1 = require("./commands/analyzeCode");
 const generateInlineCommands_1 = require("./commands/generateInlineCommands");
-const reviewSuggestion_1 = require("./commands/reviewSuggestion");
 const generateKubernetesFiles_1 = require("./commands/generateKubernetesFiles");
 function activate(context) {
     console.log('Backdoor extension is now active.');
     vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.reviewSuggestion', reviewSuggestion_1.reviewSuggestion), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles));
+    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles));
 }
 exports.activate = activate;
 function showBackdoorDashboard() {

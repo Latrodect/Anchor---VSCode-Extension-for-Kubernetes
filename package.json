@@ -1,7 +1,9 @@
 {
   "name": "backdoor",
   "displayName": "Backdoor",
-  "description": "AI powered code reviews.",
+  "description": "K8S and Docker Structure generator. Online code reviewer.",
+  "publisher": "Latrodect",
+  "icon": "images/backdoor.png", 
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.54.0"
@@ -13,9 +15,9 @@
   "activationEvents": [
     "onCommand:backdoor.analyzeCode",
     "onCommand:backdoor.generateInlineCommands",
-    "onCommand:backdoor.reviewSuggestion",
     "onCommand:backdoor.backdoorDashboardInit",
-    "onCommand:backdoor.generateKubernetesFiles"
+    "onCommand:backdoor.generateKubernetesFiles",
+    "onCommand:backdoor.generateDockerFiles"
   ],
   "contributes": {
     "commands": [
@@ -28,29 +30,27 @@
         "title": "Backdoor: Generate Inline Commands"
       },
       {
-        "command": "backdoor.reviewSuggestion",
-        "title": "Backdoor: Review Suggestion"
-      },
-      {
         "command": "backdoor.backdoorDashboardInit",
         "title": "Backdoor Reviewer: Dashboard"
       },
       {
         "command": "backdoor.generateKubernetesFiles",
         "title": "Backdoor Kubernetes: Generate K8S files"
+      },
+      {
+        "command": "backdoor.generateDockerFiles",
+        "title": "Backdoor Docker: Generate Docker files"
       }
     ]
   },
   "keybindings": [
     {
         "command": "backdoor.generateKubernetesFiles",
-        "key": "ctrl+l",
-        "when": "editorTextFocus"
+        "key": "ctrl+l"
     },
     {
       "command": "backdoor.backdoorDashboardInit",
-      "key": "ctrl+i",
-      "when": "editorTextFocus"
+      "key": "ctrl+i"
   }
   ],
   "scripts": {
