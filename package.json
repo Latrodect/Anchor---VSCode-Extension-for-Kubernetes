@@ -3,8 +3,8 @@
   "displayName": "Backdoor",
   "description": "K8S and Docker Structure generator. Online code reviewer.",
   "publisher": "Pilliage",
-  "icon": "images/backdoor.png", 
-  "version": "0.0.1",
+  "icon": "images/backdoor.png",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/Latrodect/Backdoor-VSCode-Extension-for-K8S-Setup-and-Code-Review"
@@ -49,17 +49,17 @@
   },
   "keybindings": [
     {
-      "command": "backdoor.generateDockerFiles",
+      "command": "generateDockerFiles",
       "key": "ctrl+d"
-  },
-    {
-        "command": "backdoor.generateKubernetesFiles",
-        "key": "ctrl+f"
     },
     {
-      "command": "backdoor.backdoorDashboardInit",
+      "command": "generateKubernetesFiles",
+      "key": "ctrl+f"
+    },
+    {
+      "command": "backdoorDashboardInit",
       "key": "ctrl+i"
-  }
+    }
   ],
   "scripts": {
     "compile": "tsc",
@@ -91,7 +91,7 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
-    "axios": "^1.4.0",
+    "axios": "^0.21.4",
     "esprima": "^4.0.1",
     "fs": "^0.0.1-security"
   }
