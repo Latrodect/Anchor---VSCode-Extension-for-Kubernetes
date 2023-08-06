@@ -22,73 +22,78 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateInlineComments = void 0;
 const vscode = __importStar(require("vscode"));
-const ts = __importStar(require("typescript"));
+const axios_1 = __importDefault(require("axios")); // Install axios using npm or yarn
 function generateInlineComments() {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        vscode.window.showErrorMessage('No active editor found.');
-        return;
-    }
-    const selectedCode = editor.document.getText(editor.selection);
-    if (!selectedCode.trim()) {
-        vscode.window.showInformationMessage('No code is selected.');
-        return;
-    }
-    const cyclomaticComplexity = calculateCyclomaticComplexity(selectedCode);
-    const selectedLines = getSelectedLines(editor);
-    if (selectedLines.length === 0) {
-        vscode.window.showInformationMessage('No lines are selected.');
-        return;
-    }
-    for (const line of selectedLines) {
-        const suggested = '// def function:\n//    print("test")';
-        const comment = `// Cyclomathic complexity:  ${cyclomaticComplexity} \n// For reducing complexity refactor your code like this: \n${suggested}`;
-        // Insert the comment into the editor
-        editor.edit(editBuilder => {
-            editBuilder.insert(new vscode.Position(line - 1, 0), comment + '\n');
-        });
-    }
-    vscode.window.showInformationMessage(`${selectedLines.length} lines have been commented.`);
+    return __awaiter(this, void 0, void 0, function* () {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showErrorMessage('No active editor found.');
+            return;
+        }
+        const selectedCode = getSelectedCode(editor);
+        if (!selectedCode) {
+            vscode.window.showInformationMessage('No code is selected.');
+            return;
+        }
+        const generatedComment = yield generateComment(selectedCode);
+        insertComment(editor, generatedComment);
+    });
 }
 exports.generateInlineComments = generateInlineComments;
-function calculateCyclomaticComplexity(code) {
-    const sourceFile = ts.createSourceFile('temp.ts', code, ts.ScriptTarget.ESNext, true);
-    let edges = 0;
-    let nodes = 0;
-    let components = 0;
-    function traverse(node) {
-        nodes++;
-        if (node.kind === ts.SyntaxKind.IfStatement ||
-            node.kind === ts.SyntaxKind.WhileStatement ||
-            node.kind === ts.SyntaxKind.DoStatement ||
-            node.kind === ts.SyntaxKind.ForStatement ||
-            node.kind === ts.SyntaxKind.CaseClause ||
-            node.kind === ts.SyntaxKind.CatchClause) {
-            edges++;
-        }
-        if (ts.isFunctionLike(node)) {
-            components++;
-        }
-        node.forEachChild(traverse);
+function getSelectedCode(editor) {
+    const selection = editor.selection;
+    if (selection.isEmpty) {
+        return undefined;
     }
-    traverse(sourceFile);
-    const complexity = edges - nodes + (2 * components);
-    return complexity;
+    return editor.document.getText(selection);
 }
-function getSelectedLines(editor) {
-    const selectedLines = [];
-    for (const selection of editor.selections) {
-        const startLine = selection.start.line + 1;
-        const endLine = selection.end.line + 1;
-        for (let line = startLine; line <= endLine; line++) {
-            if (!selectedLines.includes(line)) {
-                selectedLines.push(line);
-            }
+function generateComment(code) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const apiKey = yield vscode.window.showInputBox({
+            prompt: 'ChatGPT API Key',
+            placeHolder: 'sk-..JKuaJ',
+        });
+        const prompt = `Code to review:\n\n${code}\n\nPlease provide a comment for this code.`;
+        try {
+            const response = yield axios_1.default.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
+                prompt,
+                max_tokens: 50,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                },
+            });
+            return response.data.choices[0].text.trim();
         }
-    }
-    return selectedLines;
+        catch (error) {
+            console.error('Error generating comment:', error);
+            return 'Unable to generate comment at the moment.';
+        }
+    });
+}
+function insertComment(editor, comment) {
+    // Insert the generated comment at the end of the selected code
+    const selection = editor.selection;
+    const position = selection.end;
+    editor.edit(editBuilder => {
+        editBuilder.insert(position, '\n// Generated Comment: ' + comment);
+    });
+    vscode.window.showInformationMessage('Comment generated and inserted.');
 }
 //# sourceMappingURL=inlineComments.js.map
