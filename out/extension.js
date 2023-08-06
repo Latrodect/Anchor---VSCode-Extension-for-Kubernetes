@@ -67,10 +67,10 @@ function getWebviewContent(webview) {
         </head>
         <body>
             <div style="display:flex;">
-            <img src="${webview.asWebviewUri(vscode.Uri.file(path.join(extensionPath, 'images', 'backdoor.png')))}" />
+            <img src="${webview.asWebviewUri(vscode.Uri.file(path.join(extensionPath, 'images', 'png')))}" />
             <h1>Backdoor Code Reviewer</h1>
             </div>
-            <p>${webview.asWebviewUri(vscode.Uri.file(path.join(extensionPath, 'images', 'backdoor.png')))}</p>
+            <p>${webview.asWebviewUri(vscode.Uri.file(path.join(extensionPath, 'images', 'png')))}</p>
             <p style="color:white;"> Backdoor is a free code reviewer assistant. It helps developers with AI support, increases code quality with highlighter and linter features.<p>
             <br>
             <hr>
