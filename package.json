@@ -5,6 +5,10 @@
   "publisher": "Latrodect",
   "icon": "images/backdoor.png", 
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Latrodect/Backdoor-VSCode-Extension-for-K8S-Setup-and-Code-Review"
+  },
   "engines": {
     "vscode": "^1.54.0"
   },
@@ -62,7 +66,8 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "vsce:package": "vsce package"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
