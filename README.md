@@ -17,6 +17,19 @@ The **Backdoor Code Reviewer** extension for Visual Studio Code aims to enhance 
 
 ## Usage
 
+### Generate Kubernetes Deployment Files
+
+1. Use the keyboard shortcut `Ctrl+L` to trigger the "Generate Kubernetes Files" command.
+2. Enter the names of your apps (e.g., backend, frontend) separated by commas.
+3. Backdoor will create Kubernetes YAML files for your apps.
+
+### Generate Docker Files
+
+1. Use the keyboard shortcut `Ctrl+L` to trigger the "Generate Kubernetes Files" command.
+2. Enter the root of your project (e.g., /src/fronend) separated by commas.
+3. Enter the names of your apps (e.g., backend, frontend) separated by commas.
+4. Backdoor will create Dockerfile template for your project.
+
 ### Analyze Code
 
 1. Open a code file you want to analyze.
@@ -29,11 +42,6 @@ The **Backdoor Code Reviewer** extension for Visual Studio Code aims to enhance 
 2. Use the command palette (`Ctrl+Shift+P`) and search for "Backdoor Code Reviewer: Add Inline Comment".
 3. An inline comment will be added to the selected line.
 
-### Suggest Review
-
-1. Select a portion of code that you want to generate suggestions for.
-2. Use the command palette (`Ctrl+Shift+P`) and search for "Backdoor Code Reviewer: Suggest Review".
-3. The extension will generate AI-powered suggestions for code review based on the selected code.
 
 ## Configuration
 
