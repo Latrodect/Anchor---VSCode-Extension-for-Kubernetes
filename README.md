@@ -1,13 +1,14 @@
-# Backdoor Code Reviewer Extension
+# Backdoor Kubernetes & Docker Helper and Code Reviewer Extension
 
-The **Backdoor Code Reviewer** extension for Visual Studio Code aims to enhance the code review process, streamline collaboration, and improve code quality within your projects.
+The **Backdoor Kubernetes & Docker Helper and Code Reviewer** extension for Visual Studio Code aims to enhance the code review process, streamline collaboration, and improve code quality within your projects. And also this extension aims to generate kubenetes and docker structure auto.
 
 ## Features
 
+- Kubernetes and Docker folder structure and file generator.
 - Automated code analysis to identify common issues and coding standards violations.
 - Add inline comments to specific lines of code for discussions and feedback.
 - AI-powered suggestions to provide constructive feedback for code reviews.
-- ... (add more features as you develop them)
+
 
 ## Installation
 
@@ -16,22 +17,27 @@ The **Backdoor Code Reviewer** extension for Visual Studio Code aims to enhance 
 3. Search for "Backdoor Code Reviewer" and click "Install".
 
 ## Usage
+### Generate Kubernetes Deployment Files
+
+1. Use the keyboard shortcut `Ctrl+I` to trigger the "Backdoor: Dashboard" command.
+2. This dashboard include more detailed documentation of this extension.
 
 ### Generate Kubernetes Deployment Files
 
-1. Use the keyboard shortcut `Ctrl+L` to trigger the "Generate Kubernetes Files" command.
+1. Use the keyboard shortcut `Ctrl+F` to trigger the "Backdoor: Generate Kubernetes Files" command.
 2. Enter the names of your apps (e.g., backend, frontend) separated by commas.
 3. Backdoor will create Kubernetes YAML files for your apps.
 
 ### Generate Docker Files
 
-1. Use the keyboard shortcut `Ctrl+L` to trigger the "Generate Kubernetes Files" command.
+1. Use the keyboard shortcut `Ctrl+D` to trigger the "Backdoor: Generate Docker Files" command.
 2. Enter the root of your project (e.g., /src/fronend) separated by commas.
 3. Enter the names of your apps (e.g., backend, frontend) separated by commas.
 4. Backdoor will create Dockerfile template for your project.
 
 ### Analyze Code
 
+Note: This function not completed yet. When its completed you can analyze your code.
 1. Open a code file you want to analyze.
 2. Use the command palette (`Ctrl+Shift+P`) and search for "Backdoor Code Reviewer: Analyze Code".
 3. The extension will highlight potential issues and coding standards violations within the code.
@@ -65,6 +71,4 @@ Please follow the [Contributing Guidelines](CONTRIBUTING.md) for more informatio
 
 This extension is licensed under the [MIT License](LICENSE).
 
----
 
-Feel free to customize this template with your specific project details, additional sections, and any relevant links or resources. Remember to update the documentation as your extension evolves and new features are added.

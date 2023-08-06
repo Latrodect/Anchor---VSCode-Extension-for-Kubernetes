@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode),
         vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands),
-        vscode.commands.registerCommand('backdoor.reviewSuggestion', generateDockerFiles),
+        vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles),
         vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard),
         vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles)
     );
