@@ -49,8 +49,12 @@
   },
   "keybindings": [
     {
+      "command": "backdoor.generateDockerFiles",
+      "key": "ctrl+d"
+  },
+    {
         "command": "backdoor.generateKubernetesFiles",
-        "key": "ctrl+l"
+        "key": "ctrl+f"
     },
     {
       "command": "backdoor.backdoorDashboardInit",

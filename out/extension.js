@@ -43,7 +43,7 @@ function activate(context) {
     console.log('Backdoor extension is now active.');
     vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.reviewSuggestion', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles));
+    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles));
 }
 exports.activate = activate;
 function showBackdoorDashboard() {

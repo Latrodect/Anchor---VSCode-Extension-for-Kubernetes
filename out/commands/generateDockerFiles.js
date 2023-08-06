@@ -51,7 +51,7 @@ function generateDockerFiles() {
             placeHolder: 'frontned, backend, sync',
         });
         if (!contApplicaitonsPath) {
-            vscode.window.showWarningMessage('Please specify atleast one application path.');
+            vscode.window.showWarningMessage('Please specify at least one application path.');
             return;
         }
         if (!projectRoot) {
@@ -61,35 +61,34 @@ function generateDockerFiles() {
         const dockerFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'docker');
         fs.mkdirSync(dockerFolder.fsPath, { recursive: true });
         const dockerApplications = contApplicaitonsPath.split(',').map(name => name.trim());
-        dockerApplications.map((appName) => __awaiter(this, void 0, void 0, function* () {
+        for (const appName of dockerApplications) {
             const appFolder = vscode.Uri.joinPath(dockerFolder, appName);
             fs.mkdirSync(appFolder.fsPath, { recursive: true });
             const folderPath = findApplicationFolder(projectRoot, appName);
             if (folderPath) {
-                const dockerFile = `
-        # Use a base image
-        FROM node:14
-        
-        # Set the working directory inside the container
-        WORKDIR /app
-        
-        # Install dependencies
-        RUN npm install (example)
-        
-        # Copy the rest of the application code to the container
-        COPY ${folderPath} ./src/${appName}
-        
-        # Expose a port (if needed)
-        EXPOSE 3000
-        
-        # Specify the command to run when the container starts
-        CMD ["npm run start"]
-        
-          `;
-                yield writeFileWithDirectoryCheck(path.join(appFolder.fsPath, `Dockerfile`), dockerFile);
+                const dockerFileContent = `
+# Use a base image
+FROM node:14
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code to the container
+COPY ${folderPath} ./src/${appName}
+
+# Expose a port (if needed)
+EXPOSE 3000
+
+# Specify the command to run when the container starts
+CMD ["npm", "run", "start"]
+`;
+                const dockerFilePath = path.join(appFolder.fsPath, 'Dockerfile');
+                yield writeFileWithDirectoryCheck(dockerFilePath, dockerFileContent);
             }
-        }));
-        yield Promise.all(dockerApplications);
+        }
     });
 }
 exports.generateDockerFiles = generateDockerFiles;
@@ -101,13 +100,15 @@ function writeFileWithDirectoryCheck(filePath, content) {
     });
 }
 function findApplicationFolder(projectRoot, applicationName) {
-    const folders = fs.readdirSync(projectRoot);
-    for (const folder of folders) {
-        const folderPath = path.join(projectRoot, folder);
+    const folderPath = path.join(projectRoot, applicationName);
+    try {
         const stat = fs.statSync(folderPath);
-        if (stat.isDirectory() && folder === applicationName) {
+        if (stat.isDirectory()) {
             return folderPath;
         }
+    }
+    catch (error) {
+        vscode.window.showWarningMessage('Folder does not exist.');
     }
     return undefined;
 }
