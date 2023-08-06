@@ -31,13 +31,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateInlineComments = void 0;
 const vscode = __importStar(require("vscode"));
-const axios_1 = __importDefault(require("axios"));
+// import axios from 'axios';
 function generateInlineComments() {
     return __awaiter(this, void 0, void 0, function* () {
         const editor = vscode.window.activeTextEditor;
@@ -50,7 +47,8 @@ function generateInlineComments() {
             vscode.window.showInformationMessage('No code is selected.');
             return;
         }
-        const generatedComment = yield generateComment(selectedCode);
+        // await generateComment(selectedCode);
+        const generatedComment = "Axios will be added soon.";
         insertComment(editor, generatedComment);
     });
 }
@@ -62,31 +60,32 @@ function getSelectedCode(editor) {
     }
     return editor.document.getText(selection);
 }
-function generateComment(code) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const apiKey = yield vscode.window.showInputBox({
-            prompt: 'ChatGPT API Key',
-            placeHolder: 'sk-..JKuaJ',
-        });
-        const prompt = `Code to review:\n\n${code}\n\nPlease provide a comment for this code.`;
-        try {
-            const response = yield axios_1.default.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
-                prompt,
-                max_tokens: 50,
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
-                },
-            });
-            return response.data.choices[0].text.trim();
-        }
-        catch (error) {
-            console.error('Error generating comment:', error);
-            return 'Unable to generate comment at the moment.';
-        }
-    });
-}
+// async function generateComment(code: string): Promise<string> {
+//     const apiKey = await vscode.window.showInputBox({
+//         prompt: 'ChatGPT API Key',
+//         placeHolder: 'sk-..JKuaJ',
+//       });
+//     const prompt = `Code to review:\n\n${code}\n\nPlease provide a comment for this code.`;
+//     try {
+//         const response = await axios.post(
+//             'https://api.openai.com/v1/engines/davinci-codex/completions',
+//             {
+//                 prompt,
+//                 max_tokens: 50, 
+//             },
+//             {
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                     'Authorization': `Bearer ${apiKey}`,
+//                 },
+//             }
+//         );
+//         return response.data.choices[0].text.trim();
+//     } catch (error) {
+//         console.error('Error generating comment:', error);
+//         return 'Unable to generate comment at the moment.';
+//     }
+// }
 function insertComment(editor, comment) {
     const selection = editor.selection;
     const position = selection.end;

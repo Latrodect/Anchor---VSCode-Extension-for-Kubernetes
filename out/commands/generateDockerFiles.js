@@ -64,33 +64,33 @@ function generateDockerFiles() {
         fs.mkdirSync(scriptsFolder.fsPath, { recursive: true });
         const dockerApplicationsPath = contApplicaitons.split(',').map(name => "../docker/" + name.trim() + "/Dockerfile");
         const scriptContent = `
-                                #!/bin/bash
+#!/bin/bash
 
-                            # Define the applications and their Dockerfile paths
-                            APPLICATIONS=(${contApplicaitons})
-                            DOCKERFILES=("${dockerApplicationsPath}")
+# Define the applications and their Dockerfile paths
+APPLICATIONS=(${contApplicaitons})
+DOCKERFILES=("${dockerApplicationsPath}")
 
-                            # Loop through each application and build the Docker image
-                            for ((i=0; i<\${#APPLICATIONS[@]}; i++)); do
-                                APP_NAME="\${APPLICATIONS[$i]}"
-                                DOCKERFILE="\${DOCKERFILES[$i]}"
-                                echo "Building Docker image for $APP_NAME..."
-                                
-                                # Check if the Dockerfile exists
-                                if [ ! -f "$DOCKERFILE" ]; then
-                                    echo "Dockerfile not found for $APP_NAME."
-                                    continue
-                                fi
-                                
-                                # Build the Docker image
-                                docker build -t "$APP_NAME:latest" -f "$DOCKERFILE" .
-                                
-                                echo "Docker image for $APP_NAME built."
-                                echo
-                            done
+# Loop through each application and build the Docker image
+for ((i=0; i<\${#APPLICATIONS[@]}; i++)); do
+    APP_NAME="\${APPLICATIONS[$i]}"
+    DOCKERFILE="\${DOCKERFILES[$i]}"
+    echo "Building Docker image for $APP_NAME..."
+    
+    # Check if the Dockerfile exists
+    if [ ! -f "$DOCKERFILE" ]; then
+        echo "Dockerfile not found for $APP_NAME."
+        continue
+    fi
+    
+    # Build the Docker image
+    docker build -t "$APP_NAME:latest" -f "$DOCKERFILE" .
+    
+    echo "Docker image for $APP_NAME built."
+    echo
+done
 
-                            echo "All Docker images built."
-                            `;
+echo "All Docker images built."
+`;
         const scriptFilePath = path.join(scriptsFolder.fsPath, 'docker_build_image.bash');
         yield writeFileWithDirectoryCheck(scriptFilePath, scriptContent);
         const dockerApplications = contApplicaitons.split(',').map(name => name.trim());
