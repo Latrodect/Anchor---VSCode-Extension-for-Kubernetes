@@ -4,6 +4,7 @@ import { analyzeCode } from './commands/analyzeCode';
 import { generateInlineCommands } from './commands/generateInlineCommands';
 import { generateDockerFiles } from './commands/generateDockerFiles';
 import { generateKubernetesFiles } from './commands/generateKubernetesFiles';
+import { generateDockerComposeYaml } from './commands/generateDockerComposeYaml'
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Backdoor extension is now active.');
@@ -14,7 +15,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands),
         vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles),
         vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard),
-        vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles)
+        vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles),
+        vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', generateDockerComposeYaml)
     );
 }
 
