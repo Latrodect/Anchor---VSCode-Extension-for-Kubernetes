@@ -4,7 +4,7 @@
   "description": "K8S and Docker Structure generator. Online code reviewer.",
   "publisher": "Pilliage",
   "icon": "images/backdoor.png",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/Latrodect/Backdoor-VSCode-Extension-for-K8S-Setup-and-Code-Review"

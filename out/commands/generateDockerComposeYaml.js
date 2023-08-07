@@ -102,8 +102,7 @@ ${Object.entries(dockerComposeData.services)
     volumes:
       - "${serviceData.volumes[0]}"
     environment:
-      - "${serviceData.environment[0]}"
-      `)
+      - "${serviceData.environment[0]}"`)
             .join('\n')}`;
         const dockerComposeYamlPath = path.join(dockerComposeFolder.fsPath, 'docker-compose.yaml');
         yield writeFileWithDirectoryCheck(dockerComposeYamlPath, yamlContent);
