@@ -51,7 +51,7 @@ function generateKubernetesFiles() {
             vscode.window.showInformationMessage('Please specify atleast one deployment name.');
             return;
         }
-        const deploymentNames = deploymentsInput.split(',').map(name => name.trim());
+        const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
         const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
         fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
         const namespacesFolder = vscode.Uri.joinPath(kubernetesFolder, 'namespaces');
@@ -153,5 +153,8 @@ function writeFileWithDirectoryCheck(filePath, content) {
         yield fs.promises.mkdir(folderPath, { recursive: true });
         yield fs.promises.writeFile(filePath, content);
     });
+}
+function checkSpacesAndReplace(variableList) {
+    return variableList.map((item) => item.replace(/ +/g, '_'));
 }
 //# sourceMappingURL=generateKubernetesFiles.js.map

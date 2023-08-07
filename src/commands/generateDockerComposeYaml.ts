@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export async function generateDockerComposeYaml() {
+export async function generateDockerComposeYaml(autorunBool: boolean) {
     interface DockerService {
         build: {
           context: string;
@@ -59,7 +59,7 @@ export async function generateDockerComposeYaml() {
         return;
       }
       
-      const service = serviceInformation.split(',').map(name => name.trim());
+      const service = checkSpacesAndReplace(serviceInformation.split(',').map(name => name.trim()));
 
       if (service.length !== 2) {
         vscode.window.showErrorMessage('Please provide service information in the correct format: "Service Name, Service Port".');
@@ -76,7 +76,7 @@ export async function generateDockerComposeYaml() {
         environmentVariables = "env_var=default";
       }
 
-      const environmentVars = environmentVariables.split(',').map(name => name.trim());
+      const environmentVars = checkSpacesAndReplace(environmentVariables.split(',').map(name => name.trim()));
       const formattedEnvironmentVar = createEnvironmentVariables(environmentVars);
 
     serviceList.push(service);
@@ -128,9 +128,24 @@ ${Object.entries(dockerComposeData.services)
         .join('\n')}`;
 
     const dockerComposeYamlPath = path.join(dockerComposeFolder.fsPath, 'docker-compose.yaml');
-            await writeFileWithDirectoryCheck(dockerComposeYamlPath, yamlContent);
-}
+    await writeFileWithDirectoryCheck(dockerComposeYamlPath, yamlContent);
 
+    const config = vscode.workspace.getConfiguration('backdoor');
+    const dockerComposeAutorun = config.get('dockerComposeAutorun');
+
+    if (dockerComposeAutorun === true) {
+      console.log('Running Docker Compose...');
+      const workspaceDir = dockerComposeFolder.fsPath; 
+      const terminal = vscode.window.createTerminal({
+        name: 'Cmd in Workspace',
+        cwd: workspaceDir, 
+      });
+
+      terminal.sendText('docker compose up docker-compose.yaml');
+      terminal.show();
+      }
+    
+}
 async function writeFileWithDirectoryCheck(filePath: string, content: string) {
     const folderPath = path.dirname(filePath);
     await fs.promises.mkdir(folderPath, { recursive: true });
@@ -141,5 +156,10 @@ function createEnvironmentVariables(environmentVars: string[]): string[] {
   return environmentVars.map(varName => `- ${varName}=${process.env[varName] || 'default'}`);
 }
 
+function checkSpacesAndReplace(variableList: string[]){
+  return variableList.map((item) => item.replace(/ +/g, '_'))
+}
 
-
+module.exports = {
+  generateDockerComposeYaml
+};
