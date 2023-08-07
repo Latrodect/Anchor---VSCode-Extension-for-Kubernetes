@@ -36,7 +36,7 @@ exports.generateDockerComposeYaml = void 0;
 const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-function generateDockerComposeYaml() {
+function generateDockerComposeYaml(autorunBool) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!vscode.workspace.workspaceFolders) {
             vscode.window.showErrorMessage('No workspace is open.');
@@ -69,7 +69,7 @@ function generateDockerComposeYaml() {
                 vscode.window.showErrorMessage('Please provide your service information.');
                 return;
             }
-            const service = serviceInformation.split(',').map(name => name.trim());
+            const service = checkSpacesAndReplace(serviceInformation.split(',').map(name => name.trim()));
             if (service.length !== 2) {
                 vscode.window.showErrorMessage('Please provide service information in the correct format: "Service Name, Service Port".');
                 return;
@@ -82,7 +82,7 @@ function generateDockerComposeYaml() {
                 vscode.window.showInformationMessage('Default item setted to environment variables.');
                 environmentVariables = "env_var=default";
             }
-            const environmentVars = environmentVariables.split(',').map(name => name.trim());
+            const environmentVars = checkSpacesAndReplace(environmentVariables.split(',').map(name => name.trim()));
             const formattedEnvironmentVar = createEnvironmentVariables(environmentVars);
             serviceList.push(service);
             envList.push(formattedEnvironmentVar);
@@ -127,6 +127,18 @@ ${Object.entries(dockerComposeData.services)
             .join('\n')}`;
         const dockerComposeYamlPath = path.join(dockerComposeFolder.fsPath, 'docker-compose.yaml');
         yield writeFileWithDirectoryCheck(dockerComposeYamlPath, yamlContent);
+        const config = vscode.workspace.getConfiguration('backdoor');
+        const dockerComposeAutorun = config.get('dockerComposeAutorun');
+        if (dockerComposeAutorun === true) {
+            console.log('Running Docker Compose...');
+            const workspaceDir = dockerComposeFolder.fsPath;
+            const terminal = vscode.window.createTerminal({
+                name: 'Cmd in Workspace',
+                cwd: workspaceDir,
+            });
+            terminal.sendText('docker compose up docker-compose.yaml');
+            terminal.show();
+        }
     });
 }
 exports.generateDockerComposeYaml = generateDockerComposeYaml;
@@ -140,4 +152,10 @@ function writeFileWithDirectoryCheck(filePath, content) {
 function createEnvironmentVariables(environmentVars) {
     return environmentVars.map(varName => `- ${varName}=${process.env[varName] || 'default'}`);
 }
+function checkSpacesAndReplace(variableList) {
+    return variableList.map((item) => item.replace(/ +/g, '_'));
+}
+module.exports = {
+    generateDockerComposeYaml
+};
 //# sourceMappingURL=generateDockerComposeYaml.js.map

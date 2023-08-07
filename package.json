@@ -4,7 +4,7 @@
   "description": "K8S and Docker Structure generator. Online code reviewer.",
   "publisher": "Pilliage",
   "icon": "images/backdoor.png",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Latrodect/Backdoor-VSCode-Extension-for-K8S-Setup-and-Code-Review"
@@ -25,6 +25,19 @@
     "onCommand:backdoor.generateDockerComposeYaml"
   ],
   "contributes": {
+    "configuration": [
+      {
+        "type": "object",
+        "title": "Docker Compose Command Autorun",
+        "properties": {
+          "backdoor.dockerComposeAutorun": {
+            "type": "boolean",
+            "default": false,
+            "description": "Run Docker Compose automatically after creating a docker-compose.yaml file"
+          }
+        }
+      }
+    ],
     "commands": [
       {
         "command": "backdoor.analyzeCode",

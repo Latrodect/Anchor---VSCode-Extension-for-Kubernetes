@@ -19,7 +19,7 @@ export async function generateKubernetesFiles() {
       return;
   }
 
-  const deploymentNames = deploymentsInput.split(',').map(name => name.trim());
+  const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
 
     const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
     fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
@@ -137,3 +137,6 @@ async function writeFileWithDirectoryCheck(filePath: string, content: string) {
   await fs.promises.writeFile(filePath, content);
 }
 
+function checkSpacesAndReplace(variableList: string[]){
+  return variableList.map((item) => item.replace(/ +/g, '_'))
+}

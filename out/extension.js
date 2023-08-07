@@ -42,8 +42,18 @@ const generateDockerComposeYaml_1 = require("./commands/generateDockerComposeYam
 function activate(context) {
     console.log('Backdoor extension is now active.');
     vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
+    //Get config values
+    const config = vscode.workspace.getConfiguration('backdoor');
+    const dockerComposeAutorun = config.get('dockerComposeAutorun');
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles), vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', generateDockerComposeYaml_1.generateDockerComposeYaml));
+    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles), vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', () => __awaiter(this, void 0, void 0, function* () {
+        if (typeof dockerComposeAutorun === 'boolean') {
+            yield (0, generateDockerComposeYaml_1.generateDockerComposeYaml)(dockerComposeAutorun);
+        }
+        else {
+            vscode.window.showErrorMessage('Invalid value for dockerComposeAutorun.');
+        }
+    })));
 }
 exports.activate = activate;
 function showBackdoorDashboard() {
