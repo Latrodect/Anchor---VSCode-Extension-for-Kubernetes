@@ -39,11 +39,12 @@ const analyzeCode_1 = require("./commands/analyzeCode");
 const generateInlineCommands_1 = require("./commands/generateInlineCommands");
 const generateDockerFiles_1 = require("./commands/generateDockerFiles");
 const generateKubernetesFiles_1 = require("./commands/generateKubernetesFiles");
+const generateDockerComposeYaml_1 = require("./commands/generateDockerComposeYaml");
 function activate(context) {
     console.log('Backdoor extension is now active.');
     vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles));
+    context.subscriptions.push(vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles), vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', generateDockerComposeYaml_1.generateDockerComposeYaml));
 }
 exports.activate = activate;
 function showBackdoorDashboard() {
