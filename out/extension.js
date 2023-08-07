@@ -34,7 +34,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(require("vscode"));
-const path = __importStar(require("path"));
 const analyzeCode_1 = require("./commands/analyzeCode");
 const generateInlineCommands_1 = require("./commands/generateInlineCommands");
 const generateDockerFiles_1 = require("./commands/generateDockerFiles");
@@ -68,18 +67,30 @@ function getWebviewContent(webview) {
         </head>
         <body>
             <div style="display:flex;">
-            <img src="${webview.asWebviewUri(vscode.Uri.file(path.join(extensionPath, 'images', 'png')))}" />
             <h1>Backdoor Code Reviewer</h1>
             </div>
-            <p>${webview.asWebviewUri(vscode.Uri.file(path.join(extensionPath, 'images', 'png')))}</p>
             <p style="color:white;"> Backdoor is a free code reviewer assistant. It helps developers with AI support, increases code quality with highlighter and linter features.<p>
             <br>
             <hr>
-            <h2>Generate Kubernetes Deployment Files</h2>
-            <p style="color:white;"> Type CTRL + l for generate kubernetes deployment files. When you type this command input box will open. <br>Type your apps like backend, frontned with comma seperation. Enjoy.<p>
-            <button id="analyzeButton" style="${buttonStyle}">Enable Code Analysis</button>
-            <button id="analyzeButton" style="${buttonStyle}">Enable AI Support</button>
-            <button id="analyzeButton" style="${buttonStyle}">Enable Highlighter</button>
+            <h2>How to Generate docker-compose.yaml File</h2>
+            <p style="color:white;"> Type CTRL + SHIFT + P and select <strong>Backdoor Docker Compose: Generate Docker Compose YAML</strong>. Provide how many services do you have. <p>
+            <p style="color:white;"> Type your service name and port. After that step specify your environment variables. <p>
+            <p style="color:white;"> Apply this steps for each service. <p>
+            <p style="color:white;"> Your <strong>docker-compose.yaml</strong> will be created. Happy coding !!! <p>
+
+            <hr>
+
+            <h2>How to Generate Docker Files</h2>
+            <p style="color:white;"> Type CTRL + SHIFT + P and select <strong>Backdoor Docker: Generate Docker files</strong>. Provide information about root of your project. <p>
+            <p style="color:white;"> Type your application names which exist on your root.  <p>
+            <p style="color:white;"> Your <strong>Dockerfiles</strong> will be created and we create a bash script for you. Happy building !!! <p>
+
+            <hr>
+
+            <h2>How to Generate Kubernetes Files</h2>
+            <p style="color:white;"> Type CTRL + SHIFT + P and select <strong>Backdoor Kubernetes: Generate K8S files</strong>.  <p>
+            <p style="color:white;"> Provide information about your services.  <p>
+            <p style="color:white;"> Your <strong>k8s yaml</strong> and <strong>folder structure</strong> will be created. Happy deployment !!! <p>
             <script src="${webview.asWebviewUri(vscode.Uri.file(__dirname + '/script.js'))}"></script>
         </body>
         </html>
