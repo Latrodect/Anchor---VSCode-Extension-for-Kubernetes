@@ -76,23 +76,23 @@ echo "All Docker images built."
         const folderPath = findApplicationFolder(projectRoot, appName);
         if (folderPath) {
             const dockerFileContent = `
-                                        # Use a base image
-                                        FROM node:14
+# Use a base image
+FROM node:14
 
-                                        # Set the working directory inside the container
-                                        WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /app
 
-                                        # Install dependencies
-                                        RUN npm install
+# Install dependencies
+RUN npm install
 
-                                        # Copy the rest of the application code to the container
-                                        COPY ${folderPath} ./src/${appName}
+# Copy the rest of the application code to the container
+COPY ${folderPath} ./src/${appName}
 
-                                        # Expose a port (if needed)
-                                        EXPOSE 3000
+# Expose a port (if needed)
+EXPOSE 3000
 
-                                        # Specify the command to run when the container starts
-                                        CMD ["npm run start"]
+# Specify the command to run when the container starts
+CMD ["npm run start"]
                                     `;
 
             const dockerFilePath = path.join(appFolder.fsPath, 'Dockerfile');
