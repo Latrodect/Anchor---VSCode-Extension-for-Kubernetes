@@ -1,1 +1,1 @@
-export declare function generateDockerComposeYaml(): Promise<void>;
+export declare function generateDockerComposeYaml(autorunBool: boolean): Promise<void>;

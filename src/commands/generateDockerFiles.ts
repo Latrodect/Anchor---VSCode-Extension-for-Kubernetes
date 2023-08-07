@@ -34,7 +34,7 @@ export async function generateDockerFiles() {
     const scriptsFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'scripts');
     fs.mkdirSync(scriptsFolder.fsPath, { recursive: true });
 
-    const dockerApplicationsPath = contApplicaitons.split(',').map(name => "../docker/" + name.trim()+"/Dockerfile");
+    const dockerApplicationsPath = checkSpacesAndReplace(contApplicaitons.split(',').map(name => "../docker/" + name.trim()+"/Dockerfile"));
 
     const scriptContent = `
 #!/bin/bash
@@ -67,7 +67,7 @@ echo "All Docker images built."
     const scriptFilePath = path.join(scriptsFolder.fsPath, 'docker_build_image.bash');
             await writeFileWithDirectoryCheck(scriptFilePath, scriptContent);
 
-    const dockerApplications = contApplicaitons.split(',').map(name => name.trim());
+    const dockerApplications = checkSpacesAndReplace(contApplicaitons.split(',').map(name => name.trim()));
 
     for (const appName of dockerApplications) {
         const appFolder = vscode.Uri.joinPath(dockerFolder, appName);
@@ -121,3 +121,7 @@ function findApplicationFolder(projectRoot: string, applicationName: string): st
 
   return undefined;
 }
+
+function checkSpacesAndReplace(variableList: string[]){
+    return variableList.map((item) => item.replace(/ +/g, '_'))
+  }

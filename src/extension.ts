@@ -9,6 +9,9 @@ import { generateDockerComposeYaml } from './commands/generateDockerComposeYaml'
 export function activate(context: vscode.ExtensionContext) {
     console.log('Backdoor extension is now active.');
     vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
+    //Get config values
+    const config = vscode.workspace.getConfiguration('backdoor');
+    const dockerComposeAutorun = config.get('dockerComposeAutorun');
     // Register commands
     context.subscriptions.push(
         vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode),
@@ -16,7 +19,13 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles),
         vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard),
         vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles),
-        vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', generateDockerComposeYaml)
+        vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', async () => {
+            if (typeof dockerComposeAutorun === 'boolean') {
+                await generateDockerComposeYaml(dockerComposeAutorun);
+            } else {
+                vscode.window.showErrorMessage('Invalid value for dockerComposeAutorun.');
+            }
+        })
     );
 }
 
