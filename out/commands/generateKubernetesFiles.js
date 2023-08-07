@@ -74,71 +74,71 @@ function generateKubernetesFiles() {
         fs.writeFileSync(path.join(namespacesFolder.fsPath, 'production.yaml'), namespaceYAML);
         const promises = deploymentNames.map((deploymentName) => __awaiter(this, void 0, void 0, function* () {
             const deploymentYAML = `
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-          name: ${deploymentName}
-          namespace: ${namespaceName}
-          # Add other deployment details here
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: ${deploymentName}
+namespace: ${namespaceName}
+# Add other deployment details here
           `;
             yield writeFileWithDirectoryCheck(path.join(deploymentsFolder.fsPath, `${deploymentName}.yaml`), deploymentYAML);
             const serviceYAML = `
-          apiVersion: v1
-          kind: Service
-          metadata:
-          name: ${deploymentName}-service
-          namespace: ${namespaceName}
-          spec:
-          selector:
-            app: ${deploymentName}
-          ports:
-            - protocol: TCP
-              port: 80
-              targetPort: 8080
+apiVersion: v1
+kind: Service
+metadata:
+name: ${deploymentName}-service
+namespace: ${namespaceName}
+spec:
+selector:
+  app: ${deploymentName}
+ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
           `;
             yield writeFileWithDirectoryCheck(path.join(servicesFolder.fsPath, `${deploymentName}-service.yaml`), serviceYAML);
             const ingressYAML = `
-          apiVersion: networking.k8s.io/v1
-          kind: Ingress
-          metadata:
-          name: ${deploymentName}-ingress
-          namespace: ${namespaceName}
-          spec:
-          rules:
-            - host: ${deploymentName}.example.com
-              http:
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: ${deploymentName}-service
-                        port:
-                          number: 80
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+name: ${deploymentName}-ingress
+namespace: ${namespaceName}
+spec:
+rules:
+  - host: ${deploymentName}.example.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: ${deploymentName}-service
+              port:
+                number: 80
           `;
             yield writeFileWithDirectoryCheck(path.join(ingressFolder.fsPath, `${deploymentName}-ingress.yaml`), ingressYAML);
             const secretYAML = `
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: ${deploymentName}-secret
-            namespace: ${namespaceName}
-          type: Opaque
-          data:
-            username: ${Buffer.from('my-username').toString('base64')}
-            password: ${Buffer.from('my-password').toString('base64')}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${deploymentName}-secret
+  namespace: ${namespaceName}
+type: Opaque
+data:
+  username: ${Buffer.from('my-username').toString('base64')}
+  password: ${Buffer.from('my-password').toString('base64')}
           `;
             yield writeFileWithDirectoryCheck(path.join(secretsFolder.fsPath, `${deploymentName}-secret.yaml`), secretYAML);
             const configMapYAML = `
-            apiVersion: v1
-            kind: ConfigMap
-            metadata:
-              name: ${deploymentName}-configmap
-              namespace: ${namespaceName}
-            data:
-              config.properties: |
-                key1=value1
-                key2=value2
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${deploymentName}-configmap
+  namespace: ${namespaceName}
+data:
+  config.properties: |
+    key1=value1
+    key2=value2
             `;
             yield writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `${deploymentName}-configmap.yaml`), configMapYAML);
         }));

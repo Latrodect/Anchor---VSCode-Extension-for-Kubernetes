@@ -25,56 +25,90 @@ export async function generateDockerComposeYaml() {
     
     const inputServiceCount = await vscode.window.showInputBox({
         prompt: 'How many service do you want to use:',
-        placeHolder: '6',
+        placeHolder: 'Example Usage: 6',
     });
 
-    if (!inputServiceCount || inputServiceCount === "0") {
-        vscode.window.showErrorMessage('Please provide how much service do you have.');
+    if (!inputServiceCount || inputServiceCount.trim() === "") {
+        vscode.window.showErrorMessage('Please provide how many service do you have.');
         return;
     }
 
     const serviceCount = parseInt(inputServiceCount, 10);
+
+    if (Number.isNaN(serviceCount) || serviceCount <= 0 ) {
+      vscode.window.showErrorMessage('Please provide a valid positive number of services.');
+      return;
+   }
+
+   if( serviceCount >= 150){
+    vscode.window.showWarningMessage('Too many services. Extension can be crash and generating your files takes too much time!');
+    }
+
     let serviceList = []
+    let envList = []
+
     for (let index = 0; index < serviceCount; index++) {
-        const serviceInformation = await vscode.window.showInputBox({
-            prompt: 'Service Information:',
-            placeHolder: 'Example Usage: frontend, 8000, volume/path, NODE_ENV=development(environment example)',
-        });
+      const serviceInformation = await vscode.window.showInputBox({
+        prompt: 'Service Information:',
+        placeHolder: 'Example Usage: frontend(Service Name), 8000(Service Port)',
+      });
+    
+      if (!serviceInformation || inputServiceCount.trim() === "") {
+        
+        vscode.window.showErrorMessage('Please provide your service information.');
+        return;
+      }
+      
+      const service = serviceInformation.split(',').map(name => name.trim());
 
-        if (!serviceInformation) {
-            vscode.window.showErrorMessage('Please provide your service information.');
-            return;
-        }
+      if (service.length !== 2) {
+        vscode.window.showErrorMessage('Please provide service information in the correct format: "Service Name, Service Port".');
+        return;
+    }
 
-        const service = serviceInformation.split(',').map(name => name.trim());
-        if(service.length === 4){
-            serviceList.push(service)
-        }else{
-            vscode.window.showErrorMessage('Some information is missing');
-        }
+      let environmentVariables = await vscode.window.showInputBox({
+        prompt: 'Specify Environment Variables:',
+        placeHolder: 'Example Usage: mongo_host: 127.0.0.1, mongo_port: 4000, ...',
+      });
+
+      if (!environmentVariables || environmentVariables.trim() === "") {
+        vscode.window.showInformationMessage('Default item setted to environment variables.');
+        environmentVariables = "env_var=default";
+      }
+
+      const environmentVars = environmentVariables.split(',').map(name => name.trim());
+      const formattedEnvironmentVar = createEnvironmentVariables(environmentVars);
+
+    serviceList.push(service);
+    envList.push(formattedEnvironmentVar);
     }
 
     const dockerComposeFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'docker_compose');
     fs.mkdirSync(dockerComposeFolder.fsPath, { recursive: true });
     
     const dockerComposeData: DockerComposeData = {
-        version: '3',
-        services: {}
+      version: '3',
+      services: {}
+    };
+    
+    for (let index = 0; index < serviceList.length; index++) {
+      const [serviceName, port] = serviceList[index];
+      const environmentEntries = envList[index];
+    
+      const formattedEnvironmentStrings = environmentEntries.map(entry => `${entry}`).join('\n      ');
+
+      dockerComposeData.services[serviceName] = {
+        build: {
+          context: `./path/to/${serviceName}`,
+          dockerfile: 'Dockerfile'
+        },
+        ports: [`${port}:${port}`],
+        volumes: [`./path/to/${serviceName}:/app/src/${serviceName}`],
+        environment: [
+          formattedEnvironmentStrings
+        ]
       };
-      
-      serviceList.forEach(([serviceName, port]) => {
-        dockerComposeData.services[serviceName] = {
-          build: {
-            context: `./path/to/${serviceName}`,
-            dockerfile: 'Dockerfile'
-          },
-          ports: [`${port}:${port}`],
-          volumes: [`./path/to/${serviceName}:/app/src/${serviceName}`],
-          environment: [
-            `NODE_ENV=development`
-          ]
-        };
-      });
+    }
       
       const yamlContent = `
 version: '${dockerComposeData.version}'
@@ -90,7 +124,7 @@ ${Object.entries(dockerComposeData.services)
     volumes:
       - "${serviceData.volumes[0]}"
     environment:
-      - "${serviceData.environment[0]}"`)
+      ${serviceData.environment[0]}`)
         .join('\n')}`;
 
     const dockerComposeYamlPath = path.join(dockerComposeFolder.fsPath, 'docker-compose.yaml');
@@ -102,4 +136,10 @@ async function writeFileWithDirectoryCheck(filePath: string, content: string) {
     await fs.promises.mkdir(folderPath, { recursive: true });
     await fs.promises.writeFile(filePath, content);
 }
+
+function createEnvironmentVariables(environmentVars: string[]): string[] {
+  return environmentVars.map(varName => `- ${varName}=${process.env[varName] || 'default'}`);
+}
+
+
 
