@@ -83,6 +83,7 @@ function getWebviewContent(webview) {
             <br>
             <hr>
             <h2>How to Generate docker-compose.yaml File</h2>
+            <p style="color:white;"> If autorun enabled, make sure <stron>docker compose</strong> setup correctly. <p>
             <p style="color:white;"> Type CTRL + SHIFT + P and select <strong>Backdoor Docker Compose: Generate Docker Compose YAML</strong>. Provide how many services do you have. <p>
             <p style="color:white;"> Type your service name and port. After that step specify your environment variables. <p>
             <p style="color:white;"> Apply this steps for each service. <p>
