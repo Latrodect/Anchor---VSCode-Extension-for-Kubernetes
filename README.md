@@ -5,7 +5,7 @@ The **Backdoor Kubernetes & Docker Helper and Code Reviewer** extension for Visu
 ## Features
 
 - Kubernetes and Docker folder structure and file generator.
-- Automated code analysis to identify common issues and coding standards violations.
+- Create Docker Compose yaml
 - Add inline comments to specific lines of code for discussions and feedback.
 - AI-powered suggestions to provide constructive feedback for code reviews.
 
@@ -17,12 +17,14 @@ The **Backdoor Kubernetes & Docker Helper and Code Reviewer** extension for Visu
 3. Search for "Backdoor Code Reviewer" and click "Install".
 
 ## Usage
-### Generate Kubernetes Deployment Files
+### Open Backdoor Dashboard for Detailed Information
 
 1. Use the keyboard shortcut `Ctrl+I` to trigger the "Backdoor: Dashboard" command.
 2. This dashboard include more detailed documentation of this extension.
 
 ### Generate Kubernetes Deployment Files
+
+<img src="https://kubernetes.io/images/kubernetes-horizontal-color.png" width="50" height="50">
 
 1. Use the keyboard shortcut `Ctrl+F` to trigger the "Backdoor: Generate Kubernetes Files" command.
 2. Enter the names of your apps (e.g., backend, frontend) separated by commas.
@@ -30,11 +32,20 @@ The **Backdoor Kubernetes & Docker Helper and Code Reviewer** extension for Visu
 
 ### Generate Docker Files
 
+<img src="https://d1.awsstatic.com/acs/characters/Logos/Docker-Logo_Horizontel_279x131.b8a5c41e56b77706656d61080f6a0217a3ba356d.png" width="50" height="50">
+
 1. Use the keyboard shortcut `Ctrl+D` to trigger the "Backdoor: Generate Docker Files" command.
 2. Enter the root of your project (e.g., /src/fronend) separated by commas.
 3. Enter the names of your apps (e.g., backend, frontend) separated by commas.
 4. Backdoor will create Dockerfile template for your project.
 
+### Generate Docker Compose
+
+1. Use the command palette (`Ctrl+Shift+P`) and search for "Backdoor Docker Compose: Generate Docker Compose YAML".
+2. Enter the how many service do you have.
+3. Enter service name and port.
+4. Enter environment variables of that service.
+5. Provide these information for each service.
 ### Analyze Code
 
 Note: This function not completed yet. When its completed you can analyze your code.
