@@ -19,23 +19,16 @@ export async function generateKubernetesFiles() {
       return;
   }
 
-  const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
+    const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
 
     const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
-    fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
+        fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
 
-    const namespacesFolder = vscode.Uri.joinPath(kubernetesFolder, 'namespaces');
-    fs.mkdirSync(namespacesFolder.fsPath, { recursive: true });
-
-    const deploymentsFolder = vscode.Uri.joinPath(kubernetesFolder, 'deployments');
-    fs.mkdirSync(deploymentsFolder.fsPath, { recursive: true });
-
-    const servicesFolder = vscode.Uri.joinPath(kubernetesFolder, 'services');
-    fs.mkdirSync(servicesFolder.fsPath, { recursive: true });
-
-    const ingressFolder = vscode.Uri.joinPath(kubernetesFolder, 'ingess');
-    fs.mkdirSync(ingressFolder.fsPath, { recursive: true });
-
+    for(const deployment of deploymentNames){
+        const deploymentFolder = vscode.Uri.joinPath(kubernetesFolder, `${deployment}-service`);
+        fs.mkdirSync(deploymentFolder.fsPath, { recursive: true });
+    }
+        
     const configmapsFolder = vscode.Uri.joinPath(kubernetesFolder, 'configmaps');
     fs.mkdirSync(configmapsFolder.fsPath, { recursive: true });
 
@@ -46,18 +39,32 @@ export async function generateKubernetesFiles() {
     fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
 
     const namespaceYAML = "apiVersion: v1\nkind: Namespace\nmetadata:name: ${namespaceName}";
-    fs.writeFileSync(path.join(namespacesFolder.fsPath, 'development.yaml'), namespaceYAML);
-    fs.writeFileSync(path.join(namespacesFolder.fsPath, 'staging.yaml'), namespaceYAML);
-    fs.writeFileSync(path.join(namespacesFolder.fsPath, 'production.yaml'), namespaceYAML);
+    fs.writeFileSync(path.join(kubernetesFolder.fsPath, 'namespace.yaml'), namespaceYAML);
 
+    // Folder Structure design change. Files will added under service folders.
+    
     const promises = deploymentNames.map(async deploymentName => {
       const deploymentYAML = `
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: ${deploymentName}
-namespace: ${namespaceName}
-# Add other deployment details here
+  name: ${deploymentName}
+  namespace: ${namespaceName}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-container
+          image: nginx:latest
+          ports:
+            - containerPort: 80
           `;
       await writeFileWithDirectoryCheck(path.join(deploymentsFolder.fsPath, `${deploymentName}.yaml`), deploymentYAML);
 
@@ -85,7 +92,7 @@ name: ${deploymentName}-ingress
 namespace: ${namespaceName}
 spec:
 rules:
-  - host: ${deploymentName}.example.com
+  - host: ${deploymentName}.com
     http:
       paths:
         - path: /
