@@ -45,10 +45,7 @@ export async function generateKubernetesFiles() {
       vscode.window.showInformationMessage('Jobs Folder not created.');
       
   } 
-    let jobNames: string[] = []
-    if(jobsInput){
-    jobNames = checkSpacesAndReplace(jobsInput.split(',').map(name => name.trim()));
-    }
+    
 
     // Folder Generation
     const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
@@ -65,8 +62,7 @@ export async function generateKubernetesFiles() {
     const secretsFolder = vscode.Uri.joinPath(kubernetesFolder, 'secrets');
     fs.mkdirSync(secretsFolder.fsPath, { recursive: true });
 
-    const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
-    fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
+    
 
     // Deployment Yaml fs operations
     const namespaceYAML = `
@@ -170,29 +166,36 @@ data:
     vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
 
     // Jobs Yaml fs operations
-    const jobPromises = jobNames.map(async jobNames => {})
-    const jobYAML = `
+    if(jobsInput){
+      const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
+      fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
+      
+      const jobNames = checkSpacesAndReplace(jobsInput.split(',').map(name => name.trim()));
+    
+      const jobPromises = jobNames.map(async jobName => {
+      const jobYAML = `
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ${jobNames}
+  name: ${jobName}
 spec:
   completions: 1
   template:
     metadata:
-      name: ${jobNames}-pod
+      name: ${jobName}-pod
     spec:
       containers:
-        - name: ${jobNames}-container
+        - name: ${jobName}-container
           image: nginx
       restartPolicy: Never
   
         `;
-    await writeFileWithDirectoryCheck(path.join(jobsFolder.fsPath, `${jobNames}-job.yaml`), jobYAML);
-
+      await writeFileWithDirectoryCheck(path.join(jobsFolder.fsPath, `${jobName}-job.yaml`), jobYAML);
+  })
     await Promise.all(jobPromises);
     vscode.window.showInformationMessage(`${jobNames.length} deployment, service, and ingress files generated successfully.`);
   }
+}
   
 async function writeFileWithDirectoryCheck(filePath: string, content: string) {
   const folderPath = path.dirname(filePath);
