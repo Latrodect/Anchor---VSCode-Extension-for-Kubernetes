@@ -9,13 +9,23 @@ export async function generateKubernetesFiles() {
     }
     const namespaceName = ''; 
 
+    const namespaceInput = await vscode.window.showInputBox({
+      prompt: 'Your Namespace:',
+      placeHolder: 'Example: my-application',
+    });
+
+    if (!namespaceInput) {
+      vscode.window.showWarningMessage('Please specify a namespace.');
+      return;
+  }
+
     const deploymentsInput = await vscode.window.showInputBox({
       prompt: 'Your Deployment Files:',
       placeHolder: 'frontend, backend, redis',
     });
 
     if (!deploymentsInput) {
-      vscode.window.showInformationMessage('Please specify atleast one deployment name.');
+      vscode.window.showWarningMessage('Please specify atleast one deployment name.');
       return;
   }
 
@@ -44,7 +54,7 @@ export async function generateKubernetesFiles() {
     // Folder Structure design change. Files will added under service folders.
 
     const promises = deploymentNames.map(async deploymentName => {
-      const serviceFolder = vscode.Uri.joinPath(kubernetesFolder, deploymentName);
+      const serviceFolder = vscode.Uri.joinPath(kubernetesFolder, `${deploymentName}-service`);
       const deploymentYAML = `
 apiVersion: apps/v1
 kind: Deployment
@@ -67,7 +77,7 @@ spec:
           ports:
             - containerPort: 80
           `;
-      await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}.yaml`), deploymentYAML);
+      await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-deployment.yaml`), deploymentYAML);
 
       const serviceYAML = `
 apiVersion: v1
