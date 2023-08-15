@@ -7,35 +7,58 @@ export async function generateKubernetesFiles() {
         vscode.window.showErrorMessage('No workspace is open.');
         return;
     }
-    const namespaceName = ''; 
 
+    // Namespace Input 
+    const namespaceInput = await vscode.window.showInputBox({
+      prompt: 'Your Namespace:',
+      placeHolder: 'Example: my-application',
+    });
+
+    
+    if (!namespaceInput) {
+      vscode.window.showWarningMessage('Please specify a namespace.');
+      return;
+    }
+
+    const namespace = checkSpacesAndReplace([namespaceInput])
+
+    // Deployment Input 
     const deploymentsInput = await vscode.window.showInputBox({
       prompt: 'Your Deployment Files:',
-      placeHolder: 'frontend, backend, redis',
+      placeHolder: 'Example: frontend, backend, redis ',
     });
 
     if (!deploymentsInput) {
-      vscode.window.showInformationMessage('Please specify atleast one deployment name.');
+      vscode.window.showWarningMessage('Please specify atleast one deployment name.');
       return;
   }
 
-  const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
+    const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
 
+    // Jobs Input 
+    const jobsInput = await vscode.window.showInputBox({
+      prompt: 'Your Jobs:',
+      placeHolder: 'Example: collector, pickle (Give blank if you dont have job.',
+    });
+
+    if (!jobsInput) {
+      vscode.window.showInformationMessage('Jobs Folder not created.');
+      
+  } 
+    let jobNames: string[] = []
+    if(jobsInput){
+    jobNames = checkSpacesAndReplace(jobsInput.split(',').map(name => name.trim()));
+    }
+
+    // Folder Generation
     const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
-    fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
+        fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
 
-    const namespacesFolder = vscode.Uri.joinPath(kubernetesFolder, 'namespaces');
-    fs.mkdirSync(namespacesFolder.fsPath, { recursive: true });
-
-    const deploymentsFolder = vscode.Uri.joinPath(kubernetesFolder, 'deployments');
-    fs.mkdirSync(deploymentsFolder.fsPath, { recursive: true });
-
-    const servicesFolder = vscode.Uri.joinPath(kubernetesFolder, 'services');
-    fs.mkdirSync(servicesFolder.fsPath, { recursive: true });
-
-    const ingressFolder = vscode.Uri.joinPath(kubernetesFolder, 'ingess');
-    fs.mkdirSync(ingressFolder.fsPath, { recursive: true });
-
+    for(const deployment of deploymentNames){
+        const deploymentFolder = vscode.Uri.joinPath(kubernetesFolder, `${deployment}-service`);
+        fs.mkdirSync(deploymentFolder.fsPath, { recursive: true });
+    }
+        
     const configmapsFolder = vscode.Uri.joinPath(kubernetesFolder, 'configmaps');
     fs.mkdirSync(configmapsFolder.fsPath, { recursive: true });
 
@@ -45,28 +68,47 @@ export async function generateKubernetesFiles() {
     const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
     fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
 
-    const namespaceYAML = "apiVersion: v1\nkind: Namespace\nmetadata:name: ${namespaceName}";
-    fs.writeFileSync(path.join(namespacesFolder.fsPath, 'development.yaml'), namespaceYAML);
-    fs.writeFileSync(path.join(namespacesFolder.fsPath, 'staging.yaml'), namespaceYAML);
-    fs.writeFileSync(path.join(namespacesFolder.fsPath, 'production.yaml'), namespaceYAML);
+    // Deployment Yaml fs operations
+    const namespaceYAML = `
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:
+   ${namespace}`;
+    fs.writeFileSync(path.join(kubernetesFolder.fsPath, 'namespace.yaml'), namespaceYAML);
 
     const promises = deploymentNames.map(async deploymentName => {
-      const deploymentYAML = `
+    const serviceFolder = vscode.Uri.joinPath(kubernetesFolder, `${deploymentName}-service`);
+    const deploymentYAML = `
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: ${deploymentName}
-namespace: ${namespaceName}
-# Add other deployment details here
+  name: ${deploymentName}
+  namespace: ${namespace}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-container
+          image: nginx:latest
+          ports:
+            - containerPort: 80
           `;
-      await writeFileWithDirectoryCheck(path.join(deploymentsFolder.fsPath, `${deploymentName}.yaml`), deploymentYAML);
+    await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-deployment.yaml`), deploymentYAML);
 
-      const serviceYAML = `
+    const serviceYAML = `
 apiVersion: v1
 kind: Service
 metadata:
 name: ${deploymentName}-service
-namespace: ${namespaceName}
+namespace: ${namespace}
 spec:
 selector:
   app: ${deploymentName}
@@ -75,17 +117,17 @@ ports:
     port: 80
     targetPort: 8080
           `;
-      await writeFileWithDirectoryCheck(path.join(servicesFolder.fsPath, `${deploymentName}-service.yaml`), serviceYAML);
+    await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-service.yaml`), serviceYAML);
 
-      const ingressYAML = `
+    const ingressYAML = `
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
 name: ${deploymentName}-ingress
-namespace: ${namespaceName}
+namespace: ${namespace}
 spec:
 rules:
-  - host: ${deploymentName}.example.com
+  - host: ${deploymentName}.com
     http:
       paths:
         - path: /
@@ -96,41 +138,62 @@ rules:
               port:
                 number: 80
           `;
-      await writeFileWithDirectoryCheck(path.join(ingressFolder.fsPath, `${deploymentName}-ingress.yaml`), ingressYAML);
-
-      const secretYAML = `
+    await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-ingress.yaml`), ingressYAML);
+});
+    const secretYAML = `
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${deploymentName}-secret
-  namespace: ${namespaceName}
+  name: application-secret
+  namespace: ${namespace}
 type: Opaque
 data:
   username: ${Buffer.from('my-username').toString('base64')}
   password: ${Buffer.from('my-password').toString('base64')}
           `;
-        await writeFileWithDirectoryCheck(path.join(secretsFolder.fsPath, `${deploymentName}-secret.yaml`), secretYAML);
+    await writeFileWithDirectoryCheck(path.join(secretsFolder.fsPath, `application-secret.yaml`), secretYAML);
 
-        const configMapYAML = `
+    const configMapYAML = `
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ${deploymentName}-configmap
-  namespace: ${namespaceName}
+  name: application-configmap
+  namespace: ${namespace}
 data:
   config.properties: |
     key1=value1
     key2=value2
             `;
-        await writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `${deploymentName}-configmap.yaml`), configMapYAML);
-    
-  });
+    await writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `application-configmap.yaml`), configMapYAML);
 
-  await Promise.all(promises);
+    await Promise.all(promises);
+    vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
 
-  vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
-}
+    // Jobs Yaml fs operations
+    const jobPromises = jobNames.map(async jobNames => {})
+    const jobYAML = `
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${jobNames}
+spec:
+  completions: 1
+  template:
+    metadata:
+      name: ${jobNames}-pod
+    spec:
+      containers:
+        - name: ${jobNames}-container
+          image: nginx
+      restartPolicy: Never
+  
+        `;
+    await writeFileWithDirectoryCheck(path.join(jobsFolder.fsPath, `${jobNames}-job.yaml`), jobYAML);
 
+    await Promise.all(jobPromises);
+    vscode.window.showInformationMessage(`${jobNames.length} deployment, service, and ingress files generated successfully.`);
+  }
+  
 async function writeFileWithDirectoryCheck(filePath: string, content: string) {
   const folderPath = path.dirname(filePath);
   await fs.promises.mkdir(folderPath, { recursive: true });
