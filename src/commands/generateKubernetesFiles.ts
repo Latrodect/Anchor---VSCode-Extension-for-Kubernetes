@@ -8,6 +8,7 @@ export async function generateKubernetesFiles() {
         return;
     }
 
+    // Namespace Input 
     const namespaceInput = await vscode.window.showInputBox({
       prompt: 'Your Namespace:',
       placeHolder: 'Example: my-application',
@@ -21,9 +22,10 @@ export async function generateKubernetesFiles() {
 
     const namespace = checkSpacesAndReplace([namespaceInput])
 
+    // Deployment Input 
     const deploymentsInput = await vscode.window.showInputBox({
       prompt: 'Your Deployment Files:',
-      placeHolder: 'frontend, backend, redis',
+      placeHolder: 'Example: frontend, backend, redis',
     });
 
     if (!deploymentsInput) {
@@ -33,6 +35,20 @@ export async function generateKubernetesFiles() {
 
     const deploymentNames = checkSpacesAndReplace(deploymentsInput.split(',').map(name => name.trim()));
 
+    // Jobs Input 
+    const jobsInput = await vscode.window.showInputBox({
+      prompt: 'Your Jobs:',
+      placeHolder: 'Example: collector, pickle',
+    });
+
+    if (!jobsInput) {
+      vscode.window.showWarningMessage('Please specify atleast one deployment name.');
+      return;
+  }
+
+    const jobNames = checkSpacesAndReplace(jobsInput.split(',').map(name => name.trim()));
+
+    // Folder Generation
     const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
         fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
 
@@ -50,6 +66,7 @@ export async function generateKubernetesFiles() {
     const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
     fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
 
+    // Deployment Yaml fs operations
     const namespaceYAML = `
 apiVersion: v1
 kind: Namespace
@@ -57,8 +74,6 @@ metadata:
   name:
    ${namespace}`;
     fs.writeFileSync(path.join(kubernetesFolder.fsPath, 'namespace.yaml'), namespaceYAML);
-
-    // Folder Structure design change. Files will added under service folders.
 
     const promises = deploymentNames.map(async deploymentName => {
       const serviceFolder = vscode.Uri.joinPath(kubernetesFolder, `${deploymentName}-service`);
@@ -151,10 +166,30 @@ data:
     key2=value2
             `;
         await writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `application-configmap.yaml`), configMapYAML);
-    
+  
   await Promise.all(promises);
   vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
+
+  // Jobs Yaml fs operations
+  const JobPromises = jobNames.map(async jobNames => {})
+  const jobYAML = `
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${jobNames}
+spec:
+  completions: 1
+  template:
+    metadata:
+      name: ${jobNames}-pod
+    spec:
+      containers:
+        - name: ${jobNames}-container
+          image: nginx
+      restartPolicy: Never
   
+        `;
+        await writeFileWithDirectoryCheck(path.join(jobsFolder.fsPath, `${jobNames}-job.yaml`), jobYAML);
   }
 async function writeFileWithDirectoryCheck(filePath: string, content: string) {
   const folderPath = path.dirname(filePath);
