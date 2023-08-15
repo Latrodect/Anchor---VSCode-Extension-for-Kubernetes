@@ -7,17 +7,19 @@ export async function generateKubernetesFiles() {
         vscode.window.showErrorMessage('No workspace is open.');
         return;
     }
-    const namespaceName = ''; 
 
     const namespaceInput = await vscode.window.showInputBox({
       prompt: 'Your Namespace:',
       placeHolder: 'Example: my-application',
     });
 
+    
     if (!namespaceInput) {
       vscode.window.showWarningMessage('Please specify a namespace.');
       return;
-  }
+    }
+
+    const namespace = checkSpacesAndReplace([namespaceInput])
 
     const deploymentsInput = await vscode.window.showInputBox({
       prompt: 'Your Deployment Files:',
@@ -48,7 +50,12 @@ export async function generateKubernetesFiles() {
     const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
     fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
 
-    const namespaceYAML = "apiVersion: v1\nkind: Namespace\nmetadata:name: ${namespaceName}";
+    const namespaceYAML = `
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:
+   ${namespace}`;
     fs.writeFileSync(path.join(kubernetesFolder.fsPath, 'namespace.yaml'), namespaceYAML);
 
     // Folder Structure design change. Files will added under service folders.
@@ -60,7 +67,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ${deploymentName}
-  namespace: ${namespaceName}
+  namespace: ${namespace}
 spec:
   replicas: 3
   selector:
@@ -84,7 +91,7 @@ apiVersion: v1
 kind: Service
 metadata:
 name: ${deploymentName}-service
-namespace: ${namespaceName}
+namespace: ${namespace}
 spec:
 selector:
   app: ${deploymentName}
@@ -100,7 +107,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
 name: ${deploymentName}-ingress
-namespace: ${namespaceName}
+namespace: ${namespace}
 spec:
 rules:
   - host: ${deploymentName}.com
@@ -115,20 +122,16 @@ rules:
                 number: 80
           `;
       await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-ingress.yaml`), ingressYAML);
-
       
-
-  await Promise.all(promises);
   
   
-  vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
 });
 const secretYAML = `
 apiVersion: v1
 kind: Secret
 metadata:
   name: application-secret
-  namespace: ${namespaceName}
+  namespace: ${namespace}
 type: Opaque
 data:
   username: ${Buffer.from('my-username').toString('base64')}
@@ -141,7 +144,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: application-configmap
-  namespace: ${namespaceName}
+  namespace: ${namespace}
 data:
   config.properties: |
     key1=value1
@@ -149,6 +152,9 @@ data:
             `;
         await writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `application-configmap.yaml`), configMapYAML);
     
+  await Promise.all(promises);
+  vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
+  
   }
 async function writeFileWithDirectoryCheck(filePath: string, content: string) {
   const folderPath = path.dirname(filePath);
