@@ -42,8 +42,9 @@ export async function generateKubernetesFiles() {
     fs.writeFileSync(path.join(kubernetesFolder.fsPath, 'namespace.yaml'), namespaceYAML);
 
     // Folder Structure design change. Files will added under service folders.
-    
+
     const promises = deploymentNames.map(async deploymentName => {
+      const serviceFolder = vscode.Uri.joinPath(kubernetesFolder, deploymentName);
       const deploymentYAML = `
 apiVersion: apps/v1
 kind: Deployment
@@ -66,7 +67,7 @@ spec:
           ports:
             - containerPort: 80
           `;
-      await writeFileWithDirectoryCheck(path.join(deploymentsFolder.fsPath, `${deploymentName}.yaml`), deploymentYAML);
+      await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}.yaml`), deploymentYAML);
 
       const serviceYAML = `
 apiVersion: v1
@@ -82,7 +83,7 @@ ports:
     port: 80
     targetPort: 8080
           `;
-      await writeFileWithDirectoryCheck(path.join(servicesFolder.fsPath, `${deploymentName}-service.yaml`), serviceYAML);
+      await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-service.yaml`), serviceYAML);
 
       const ingressYAML = `
 apiVersion: networking.k8s.io/v1
@@ -103,41 +104,42 @@ rules:
               port:
                 number: 80
           `;
-      await writeFileWithDirectoryCheck(path.join(ingressFolder.fsPath, `${deploymentName}-ingress.yaml`), ingressYAML);
+      await writeFileWithDirectoryCheck(path.join(serviceFolder.fsPath, `${deploymentName}-ingress.yaml`), ingressYAML);
 
-      const secretYAML = `
+      
+
+  await Promise.all(promises);
+  
+  
+  vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
+});
+const secretYAML = `
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${deploymentName}-secret
+  name: application-secret
   namespace: ${namespaceName}
 type: Opaque
 data:
   username: ${Buffer.from('my-username').toString('base64')}
   password: ${Buffer.from('my-password').toString('base64')}
           `;
-        await writeFileWithDirectoryCheck(path.join(secretsFolder.fsPath, `${deploymentName}-secret.yaml`), secretYAML);
+        await writeFileWithDirectoryCheck(path.join(secretsFolder.fsPath, `application-secret.yaml`), secretYAML);
 
         const configMapYAML = `
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ${deploymentName}-configmap
+  name: application-configmap
   namespace: ${namespaceName}
 data:
   config.properties: |
     key1=value1
     key2=value2
             `;
-        await writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `${deploymentName}-configmap.yaml`), configMapYAML);
+        await writeFileWithDirectoryCheck(path.join(configmapsFolder.fsPath, `application-configmap.yaml`), configMapYAML);
     
-  });
-
-  await Promise.all(promises);
-
-  vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
-}
-
+  }
 async function writeFileWithDirectoryCheck(filePath: string, content: string) {
   const folderPath = path.dirname(filePath);
   await fs.promises.mkdir(folderPath, { recursive: true });
