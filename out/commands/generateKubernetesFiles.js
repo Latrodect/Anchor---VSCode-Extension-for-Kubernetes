@@ -70,10 +70,6 @@ function generateKubernetesFiles() {
         if (!jobsInput) {
             vscode.window.showInformationMessage('Jobs Folder not created.');
         }
-        let jobNames = [];
-        if (jobsInput) {
-            jobNames = checkSpacesAndReplace(jobsInput.split(',').map(name => name.trim()));
-        }
         // Folder Generation
         const kubernetesFolder = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'kubernetes');
         fs.mkdirSync(kubernetesFolder.fsPath, { recursive: true });
@@ -85,8 +81,6 @@ function generateKubernetesFiles() {
         fs.mkdirSync(configmapsFolder.fsPath, { recursive: true });
         const secretsFolder = vscode.Uri.joinPath(kubernetesFolder, 'secrets');
         fs.mkdirSync(secretsFolder.fsPath, { recursive: true });
-        const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
-        fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
         // Deployment Yaml fs operations
         const namespaceYAML = `
 apiVersion: v1
@@ -183,27 +177,33 @@ data:
         yield Promise.all(promises);
         vscode.window.showInformationMessage(`${deploymentNames.length} deployment, service, and ingress files generated successfully.`);
         // Jobs Yaml fs operations
-        const jobPromises = jobNames.map((jobNames) => __awaiter(this, void 0, void 0, function* () { }));
-        const jobYAML = `
+        if (jobsInput) {
+            const jobsFolder = vscode.Uri.joinPath(kubernetesFolder, 'jobs');
+            fs.mkdirSync(jobsFolder.fsPath, { recursive: true });
+            const jobNames = checkSpacesAndReplace(jobsInput.split(',').map(name => name.trim()));
+            const jobPromises = jobNames.map((jobName) => __awaiter(this, void 0, void 0, function* () {
+                const jobYAML = `
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ${jobNames}
+  name: ${jobName}
 spec:
   completions: 1
   template:
     metadata:
-      name: ${jobNames}-pod
+      name: ${jobName}-pod
     spec:
       containers:
-        - name: ${jobNames}-container
+        - name: ${jobName}-container
           image: nginx
       restartPolicy: Never
   
         `;
-        yield writeFileWithDirectoryCheck(path.join(jobsFolder.fsPath, `${jobNames}-job.yaml`), jobYAML);
-        yield Promise.all(jobPromises);
-        vscode.window.showInformationMessage(`${jobNames.length} deployment, service, and ingress files generated successfully.`);
+                yield writeFileWithDirectoryCheck(path.join(jobsFolder.fsPath, `${jobName}-job.yaml`), jobYAML);
+            }));
+            yield Promise.all(jobPromises);
+            vscode.window.showInformationMessage(`${jobNames.length} deployment, service, and ingress files generated successfully.`);
+        }
     });
 }
 exports.generateKubernetesFiles = generateKubernetesFiles;
