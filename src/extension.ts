@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { analyzeCode } from './commands/analyzeCode';
 import { generateInlineCommands } from './commands/generateInlineCommands';
 import { generateDockerFiles } from './commands/generateDockerFiles';
 import { generateKubernetesFiles } from './commands/generateKubernetesFiles';
@@ -14,7 +13,6 @@ export function activate(context: vscode.ExtensionContext) {
     const dockerComposeAutorun = config.get('dockerComposeAutorun');
     // Register commands
     context.subscriptions.push(
-        vscode.commands.registerCommand('compose-core.analyzeCode', analyzeCode),
         vscode.commands.registerCommand('compose-core.generateInlineCommands', generateInlineCommands),
         vscode.commands.registerCommand('compose-core.generateDockerFiles', generateDockerFiles),
         vscode.commands.registerCommand('compose-core.composeCoreDashboardInit', showBackdoorDashboard),

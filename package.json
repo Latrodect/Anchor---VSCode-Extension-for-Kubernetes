@@ -17,7 +17,6 @@
   ],
   "main": "./out/extension.js",
   "activationEvents": [
-    "onCommand:compose-core.analyzeCode",
     "onCommand:compose-core.generateInlineCommands",
     "onCommand:compose-core.backdoorDashboardInit",
     "onCommand:compose-core.generateKubernetesFiles",
@@ -39,10 +38,6 @@
       }
     ],
     "commands": [
-      {
-        "command": "compose-core.analyzeCode",
-        "title": "Core: Analyze Code"
-      },
       {
         "command": "compose-core.generateInlineCommands",
         "title": "Core: Generate Inline Commands"
