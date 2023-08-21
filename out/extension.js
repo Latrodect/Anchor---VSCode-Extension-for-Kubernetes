@@ -34,7 +34,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(require("vscode"));
-const analyzeCode_1 = require("./commands/analyzeCode");
 const generateInlineCommands_1 = require("./commands/generateInlineCommands");
 const generateDockerFiles_1 = require("./commands/generateDockerFiles");
 const generateKubernetesFiles_1 = require("./commands/generateKubernetesFiles");
@@ -46,7 +45,7 @@ function activate(context) {
     const config = vscode.workspace.getConfiguration('compose-core');
     const dockerComposeAutorun = config.get('dockerComposeAutorun');
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('compose-core.analyzeCode', analyzeCode_1.analyzeCode), vscode.commands.registerCommand('compose-core.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('compose-core.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('compose-core.composeCoreDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('compose-core.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles), vscode.commands.registerCommand('compose-core.generateDockerComposeYaml', () => __awaiter(this, void 0, void 0, function* () {
+    context.subscriptions.push(vscode.commands.registerCommand('compose-core.generateInlineCommands', generateInlineCommands_1.generateInlineCommands), vscode.commands.registerCommand('compose-core.generateDockerFiles', generateDockerFiles_1.generateDockerFiles), vscode.commands.registerCommand('compose-core.composeCoreDashboardInit', showBackdoorDashboard), vscode.commands.registerCommand('compose-core.generateKubernetesFiles', generateKubernetesFiles_1.generateKubernetesFiles), vscode.commands.registerCommand('compose-core.generateDockerComposeYaml', () => __awaiter(this, void 0, void 0, function* () {
         if (typeof dockerComposeAutorun === 'boolean') {
             yield (0, generateDockerComposeYaml_1.generateDockerComposeYaml)(dockerComposeAutorun);
         }
