@@ -130,7 +130,7 @@ ${Object.entries(dockerComposeData.services)
     const dockerComposeYamlPath = path.join(dockerComposeFolder.fsPath, 'docker-compose.yaml');
     await writeFileWithDirectoryCheck(dockerComposeYamlPath, yamlContent);
 
-    const config = vscode.workspace.getConfiguration('backdoor');
+    const config = vscode.workspace.getConfiguration('compose-core');
     const dockerComposeAutorun = config.get('dockerComposeAutorun');
 
     if (dockerComposeAutorun === true) {

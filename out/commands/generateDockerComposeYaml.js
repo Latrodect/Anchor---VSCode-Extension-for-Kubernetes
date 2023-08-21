@@ -127,7 +127,7 @@ ${Object.entries(dockerComposeData.services)
             .join('\n')}`;
         const dockerComposeYamlPath = path.join(dockerComposeFolder.fsPath, 'docker-compose.yaml');
         yield writeFileWithDirectoryCheck(dockerComposeYamlPath, yamlContent);
-        const config = vscode.workspace.getConfiguration('backdoor');
+        const config = vscode.workspace.getConfiguration('compose-core');
         const dockerComposeAutorun = config.get('dockerComposeAutorun');
         if (dockerComposeAutorun === true) {
             console.log('Running Docker Compose...');

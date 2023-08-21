@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { analyzeCode } from './commands/analyzeCode';
 import { generateInlineCommands } from './commands/generateInlineCommands';
 import { generateDockerFiles } from './commands/generateDockerFiles';
 import { generateKubernetesFiles } from './commands/generateKubernetesFiles';
@@ -10,16 +9,15 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Backdoor extension is now active.');
     vscode.window.showInformationMessage('Important: Use CTRL + i for open extension UI.');
     //Get config values
-    const config = vscode.workspace.getConfiguration('backdoor');
+    const config = vscode.workspace.getConfiguration('compose-core');
     const dockerComposeAutorun = config.get('dockerComposeAutorun');
     // Register commands
     context.subscriptions.push(
-        vscode.commands.registerCommand('backdoor.analyzeCode', analyzeCode),
-        vscode.commands.registerCommand('backdoor.generateInlineCommands', generateInlineCommands),
-        vscode.commands.registerCommand('backdoor.generateDockerFiles', generateDockerFiles),
-        vscode.commands.registerCommand('backdoor.backdoorDashboardInit', showBackdoorDashboard),
-        vscode.commands.registerCommand('backdoor.generateKubernetesFiles', generateKubernetesFiles),
-        vscode.commands.registerCommand('backdoor.generateDockerComposeYaml', async () => {
+        vscode.commands.registerCommand('compose-core.generateInlineCommands', generateInlineCommands),
+        vscode.commands.registerCommand('compose-core.generateDockerFiles', generateDockerFiles),
+        vscode.commands.registerCommand('compose-core.composeCoreDashboardInit', showBackdoorDashboard),
+        vscode.commands.registerCommand('compose-core.generateKubernetesFiles', generateKubernetesFiles),
+        vscode.commands.registerCommand('compose-core.generateDockerComposeYaml', async () => {
             if (typeof dockerComposeAutorun === 'boolean') {
                 await generateDockerComposeYaml(dockerComposeAutorun);
             } else {
@@ -43,7 +41,7 @@ async function showBackdoorDashboard() {
 
 function getWebviewContent(webview: vscode.Webview): string {
     const buttonStyle = 'padding: 6px 12px; font-size: 16px; background-color:#313131; border-radius:7px; border:1px solid white; color:white; margin: 10px;';
-    const extensionPath = vscode.extensions.getExtension('Latrodect.backdoor')?.extensionPath || '';
+    const extensionPath = vscode.extensions.getExtension('Latrodect.compose-core')?.extensionPath || '';
     return `
         <!DOCTYPE html>
         <html lang="en">
